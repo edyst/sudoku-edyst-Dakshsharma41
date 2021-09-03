@@ -10,768 +10,454 @@ const easy = [
     "-1-5-------97-42----5----7-5---3---7-6--2-41---8--5---1-4------2-3-----9-7----8--",
     "712583694639714258845269173521436987367928415498175326184697532253841769976352841"
   ];
-  
-  
-  var currentbox;
-  var difficulty_level = easy[0];
-  var difficulty = 1;
-  let answer;
- 
-  var firstbtn=query("#easy-level");
-  
-  window.onload = function () {
-      firstbtn.style.border="2px solid rgb(131, 224, 220)";
-      startGame();
-  }
-  
-  function checkNum(event){
-    return event.keyCode>=49 && event.keyCode<=57;
-  }
-  function switchDifficultyLevel(num) {
-    switch(num)
+var selectedCell;
+var difficulty = easy[0];
+var answer = [""];
+let diffNum = 1;
+window.onload = function () {
+    startGame(); 
+}
+function changeDifficulty(n) {
+    switch(n)
     {
-        case 1 : difficulty_level = easy[0];
-                  break;
-        case 2 : {difficulty_level = medium[0];
-                 firstbtn.style.border=null;
-                 break;}
-        case 3 : difficulty_level = hard[0];
-                  break;
-        default: difficulty_level = easy[0];
+        case 1 :  window.difficulty = easy[0];
+        break;
+        case 2 :  window.difficulty = medium[0];
+        break;
+        case 3 :  window.difficulty = hard[0];
+        break;
+        default: window.difficulty = easy[0];
     }
-    difficulty = num;
-    for(var i=0;i<81;i++)
-    {getId("box-"+(i+1)).classList.remove("disable");
-    }
-    for(let i=1;i<=81;i++){
-        getId(i).classList.remove("instance");
-    }
+    diffNum = n;
     startGame();
-  }
-  
-  function startGame(){
-    clearPrevious();
-    let Board;    
-    Board = difficulty_level;    
-    generateBoard(Board); 
-  }
-  
-  function generateBoard(Board) {
-    
-    clearPrevious();
-    DisableFixed();
-  
-    if (Board == easy[0]) {
-      answer = easy[1];
-    }
-    if (Board == medium[0]) {
-      answer = medium[1];
-    }
-    if (Board == hard[0]) {
-      answer = hard[1];
-    }
-    clearIncorrect();
-  
-    for(var i=0;i<81;i++)
-      {
-        let input=Board.charAt(i);
-        if(input!="-"){   
-                getId((i+1)).value= input;
-                getId((i+1)).disabled = true;
-                getId("box-"+(i+1)).classList.add("disable");
-                getId(i+1).classList.remove("input-text");
-                highLights();
-            }
-            else{
-              //getId(i+1).classList.remove("instance");
-              getId(i+1).setAttribute("onkeyup","checkInput()");
-              getId(i+1).addEventListener("keyup",(event)=>{
-                instances(event);
-              })
-              getId(i+1).addEventListener("keydown",(event)=>{
-                removeInstance(event);
-              })
-              //highLights();
-            }
-      }
-  }
-  function removeInstance(event){
-    for(let i=1;i<=81;i++){
-        if(event.keyCode==8){
-          getId(i).classList.remove("instance");
-        }
-    }
-  }
-  function instances(event){
-      let val=event.target.value;
-      for(let i=1;i<=81;i++)
-      {
-        if(val==getId(i).value && getId(i).value!="")
-        {
-          getId(i).classList.add("instance");
-        }
-       
-      }
-      
-  }
-  function clearPrevious() {
-    for(let i=1;i<=81;i++)
-    {
-      getId(i).classList.remove("highlight","incorrect");
-      getId(i).value="";
-    }
-  }
-  function highLights() {
-    for (let j = 1; j <= 81; j++) {
-      getId(j).classList.remove("highlight", "current-box");
-    }
-  }
-  function DisableFixed()
-  {
-    for(var i=1;i<=81;i++)
-    {
-        getId(i).disabled=false;
-       
-    }
-  }
-  
-  
-  const onClick = function () {
-    let y = this.id;
-   
-  
-    highLights(); //(Clearing Css property of any other selected box)
-    for(let i=1;i<=81;i++){
-        getId(i).classList.remove("instance");
-    }
-    getId(y).classList.add("current-box"); //(Adding class current-box to current-box selected box which is being clicked)
-    
-   
-  
-  
-    // (logic of selecting rows and columns of the celected box)
-    for (let q = 0; q < 81;) {
-      let c = y % 9;
-      if (c == 0) { c = 9; }
-      let e = q + c;
-      getId(e).classList.add("highlight");
-      q = q + 9;
-      for (let input = 1; input <= 81; input++) {
-        for (i = 0; i < 9; i++) {
-          let j = i + 1;
-          if (y / 9 > i && y / 9 <= j && input / 9 > i && input / 9 <= j) {
-            getId(input).classList.add("highlight");
-          }
-        }
-      }
-    }
-  
-    // (function for selecting 3x3 grid)
-    threebythree(y);
-  
-  }
-  
-  // (loop for bypassing individual box id which is being clicked on)
-  for (let l = 1; l <= 81; l++) {
-    getId(l).onclick = onClick;
-  }
-
-
-  
-  // (logic for clearing css property of selected box)
-  
-  
-  // (removing incorrect class) 
-  function clearIncorrect() {
-    for (let j = 1; j <= 81; j++) {
-      getId(j).classList.remove("incorrect");
-    }
-  }
-  
-  function threebythree(y) {
-    for (let i = 1; i <= 81; i++) {
-      let d = y % 9;
-      let s = i % 9;
-      if (d == 1 || d == 2 || d == 3) {
-        if (s == 1 || s == 2 || s == 3) {
-          if (y <= 21 && i <= 21) {
-            getId(i).classList.add("highlight");
-          }
-          else if (y > 21 && y <= 48 && i > 21 && i <= 48) {
-            getId(i).classList.add("highlight");
-          }
-          else if (y > 48 && y <= 75 && i > 48 && i <= 75) {
-            getId(i).classList.add("highlight");
-          }
-        }
-      }
-      if (d == 4 || d == 5 || d == 6) {
-        if (s == 4 || s == 5 || s == 6) {
-          if (y <= 24 && i <= 24) {
-            getId(i).classList.add("highlight");
-          }
-          else if (y > 24 && y <= 51 && i > 24 && i <= 51) {
-            getId(i).classList.add("highlight");
-          }
-          else if (y > 51 && y <= 78 && i > 51 && i <= 78) {
-            getId(i).classList.add("highlight");
-          }
-        }
-      }
-      if (d == 7 || d == 8 || d == 0) {
-        if (s == 7 || s == 8 || s == 0) {
-          if (y <= 27 && i <= 27) {
-            getId(i).classList.add("highlight");
-          }
-          else if (y > 27 && y <= 54 && i > 27 && i <= 54) {
-            getId(i).classList.add("highlight");
-          }
-          else if (y > 54 && y <= 81 && i > 54 && i <= 81) {
-            getId(i).classList.add("highlight");
-          }
-        }
-      }
-    }
-  }
-  
-  function checkRow() {
-    for (let i = 1; i <= 81; i++) {
-      for (let y = 1; y <= 81; y++) {
-        if ((i % 9 == y % 9) && i != y) {
-          if (getId(i).value == getId(y).value) {
-            getId(i).classList.add("incorrect");
-            getId(y).classList.add("incorrect");
-          }
-        }
-      }
-    }
-  }
-  
-  function checkColumn() {
-    for (let x = 1; x <= 81; x++) {
-      for (let y = 1; y <= 81; y++) {
-        for (let i = 0; i < 9; i++) {
-          let j = i + 1;
-          if (x / 9 <= j && y / 9 <= j && x / 9 > i && y / 9 > i && x != y) {
-            if (getId(x).value == getId(y).value) {
-              getId(x).classList.add("incorrect");
-              getId(y).classList.add("incorrect");
-            }
-          }
-        }
-      }
-    }
-  }
-  function checkbox(){
-    let boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=1;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-      
-      /2nd box/
-       boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=4;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-      /3rd box/
-      boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=7;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-/4th box/
-boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=28;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-      /5th box/
-      boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=31;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-      /6th box/
-      boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=34;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-      /7th box/
-      boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=55;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-/8th box/
-boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=58;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-      /9th box/
-      boxInput="";
-    var ids=[];
-    var a=0;
-      for(var i=61;a<3;i+=9)
-      {a++;
-        if((getId(i).value)!=""){
-      boxInput+=getId(i).value;
-    ids.push(i);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i) ; 
-    }
-    if((getId(i+1).value)!=""){
-      boxInput+=getId(i+1).value;
-    ids.push(i+1);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+1) ; 
-    }
-    if((getId(i+2).value)!=""){
-      boxInput+=getId(i+2).value;
-    ids.push(i+2);    
-    }
-      else{
-      boxInput+="-";
-    ids.push(i+2) ; 
-    }
-   
-      }
-      console.log(boxInput);
-      
-    for(var j=0;j<boxInput.length;j++)
-     {
-       var checker=boxInput[j];
-       if(checker=="-")
-       continue;
-       for(var k=0;k<boxInput.length&&k!=j;k++)
-       {
-           if(boxInput[k]==checker)
-           {console.log(ids[j],ids[k]);
-          
-            getId(ids[j]).classList.add("incorrect");
-            getId(ids[k]).classList.add("incorrect");
-           }
-       }
-      }
-  }
-  
-  function checkInput() {
-   
-    
-    clearIncorrect();
-    checkRow();
-    checkColumn();
-    checkbox();
-    
-  }
-  
-  function selectInstances(id){
-    var value=document.getElementById(id).value
-    var last2 = id.slice(-2);
-    if(last2=>1&&last2<=9){
-for(var i=1;i<=9;i++)
-{
-    if(i!=last2)
-    {
-        if(document.getElementById((i).toString()).value==value)
-        document.getElementById(id).style.backgroundColor="red";
-      
-    }
 }
-    }
-    if(last2=>21&&last2<=29){
-        for(var i=21;i<=29;i++)
-        {
-            if(i!=last2)
+function updateMove() {
+    if(selectedCell)
+    {
+        document.addEventListener('keydown', (event) => {
+            var name = event.key;
+            if(name>0 && name<10 && cani(name))
             {
-                if(document.getElementById("i"+(i).toString()).value==value)
-                document.getElementById(id).style.backgroundColor="red";
-              
+            selectedCell.textContent = name;
+            addToArray(name);
+            addToCache();          
+            } else if(name==0){
+                selectedCell.textContent = null;
+                removeFromArray();
+            }
+          }, false);       
+    }
+    highSelect();
+}
+function startGame() {
+    let board;    
+    board = difficulty;    
+    fillAns(difficulty);    
+    createBoard(board);
+    if(sessionStorage.getItem("cache")){
+        var saved  = sessionStorage.getItem("cache");
+        var diff = sessionStorage.getItem("diff");
+        if(diff != diffNum){
+        if(diff==1) {
+            changeDifficulty(1);
+        } else if(diff==2) {
+            changeDifficulty(2);
+        } else if(diff==3) {
+            changeDifficulty(3);
+        }
+            } else {
+            saved = saved.split(",");
+            answer = saved;
+            for(i=0;i<81;i++){
+            if(saved[i]!="-" && saved[i]!=difficulty[i]){
+            qA(".cell")[i].classList.add("modified"); 
+            id(i).textContent = saved[i];
             }
         }
             }
-   
+        
+    }
 }
-  
-  function validate() {
-    let count=0;
-    for (let i=0; i<81;i++){
-      if(answer.charAt(i) == getId(i+1).value){
-        count++;
-      }
+function highSelect() {
+    for(let i=0;i<81;i++) {
+    qA(".cell")[i].classList.remove("highlighted");
+    qA(".cell")[i].classList.remove("dup");
     }
-    if(count==81){
-      alert("Right answer");
-      clearPrevious();
+    let col = parseInt(selectedCell.id % 9);
+    let row = parseInt(selectedCell.id / 9);
+    let s = selectedCell.id;
+    for(let i=0;i<81;i++){
+        if(parseInt(selectedCell.textContent)==answer[i])
+        id(i).classList.add("dup");
     }
-    else 
-        alert("Wrong answer");
-  }
-  function solve(){
-    for(var i=1;i<=81;i++)
-    {getId(i).value=answer.charAt(i-1);
+    for(let i=col;i<col+73;i+=9)
+    {
+        if(i!=s) {
+            id(i).classList.add("highlighted");
+        }       
+    } 
+    for(let i=row*9;i<row*9+9;i++)
+    {
+        if(i!=s) {
+            id(i).classList.add("highlighted");
+        }
     }
-  }
-  
- 
-  //helper functions/
-  function getId(id) {
+    let x = 0;
+    let y = 3;
+    if( (-1<s && s<3) || (8<s && s<12) || (17<s && s<21) ) {    
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }
+        }
+    x = 3;
+    y = 6;
+    if( (2<s && s<6) || (11<s && s<15) || (20<s && s<24) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }
+    }
+    x = 6;
+    y = 9;
+    if( (5<s && s<9) || (14<s && s<18) || (23<s && s<27) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }       
+    }
+    x=27;
+    y=30;
+    if( (26<s && s<30) || (35<s && s<39) || (44<s && s<48) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }    
+    }
+    x = 30;
+    y = 33;
+    if( (29<s && s<33) || (38<s && s<42) || (47<s && s<51) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }    
+    }
+    x = 33;
+    y = 36;
+    if( (32<s && s<36) || (41<s && s<45) || (50<s && s<54) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }    
+    }
+    x = 54;
+    y = 57;
+    if( (53<s && s<57) || (62<s && s<66) || (71<s && s<75) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }    
+    }
+    x = 57;
+    y = 60;
+    if( (56<s && s<60) || (65<s && s<69) || (74<s && s<78) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }    
+    }
+    x = 60;
+    y = 63;
+    if( (59<s && s<63) || (68<s && s<72) || (77<s && s<81) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(j!=s) {
+                    id(j).classList.add("highlighted");
+                }
+                }
+            }   
+    }
+}
+function createBoard(board) {
+    clearPrevious();
+    let idCell = 0;
+    for(let i=0;i<81;i++){
+        let cell  = document.createElement("p");
+        if(board.charAt(i)!="-") {
+            cell.textContent = board.charAt(i);
+            cell.classList.add("prefilled");
+        }   else {
+            cell.addEventListener("click", function(){
+                if(cell.classList.contains("selected")) {
+                    cell.classList.remove("selected");
+                    selectedCell = null;
+                } else {
+                    for(let i=0;i<81;i++) {
+                        qA(".cell")[i].classList.remove("selected");
+                    }                  
+                }
+                cell.classList.add("selected");
+                selectedCell = cell;
+                updateMove();
+            }); 
+        }
+        cell.id = idCell;
+        idCell++;
+        cell.classList.add("cell");
+        if((cell.id > 17 && cell.id < 27) || (cell.id > 44 && cell.id < 54 )) {
+            cell.classList.add("bottomBorder");
+        }
+        if( ((cell.id + 1) % 9 == 3) || ((cell.id + 1) % 9 == 6) ) {
+            cell.classList.add("rightBorder");
+        }
+        if((cell.id + 1) % 9 == 0 || (cell.id + 1) % 9 == 0) {
+              cell.classList.add("rightBorder");
+         }
+        if((cell.id + 2) % 9 == 2 || (cell.id + 2) % 9 == 2) {
+            cell.classList.add("leftBorder");
+       }
+        if((cell.id > 71 && cell.id < 81)) {
+            cell.classList.add("bottomBorder");
+        }
+        if((cell.id > -1 && cell.id < 9)) {
+            cell.classList.add("topBorder");
+        }
+        id("board").appendChild(cell);
+    }
+}
+function clearPrevious() {
+    let cells = qA(".cell")
+    for(let i=0;i<cells.length;i++)
+    {
+        cells[i].remove();
+    }
+}
+function reset(){
+    let diff = sessionStorage.getItem("diff");
+    sessionStorage.clear();
+    changeDifficulty(diff);
+}
+function fillAns(str) {
+    for(let i=0;i<str.length;i++) {
+        answer[i] = str[i];
+    }  
+}
+function addToCache() {
+    sessionStorage.setItem("cache",answer);
+    sessionStorage.setItem("diff",diffNum);
+}
+function addToArray(num) {
+    let index = q(".selected").id;
+    answer.splice(index,1,num);
+    q(".selected").classList.add("modified");
+    duplicate(num);
+}
+function removeFromArray() {
+    let index = q(".selected").id;
+    answer.splice(index,1,"-");
+    q(".selected").classList.remove("modified");
+}
+function duplicate(num) {
+    for(let i=0;i<81;i++){
+        if(num==answer[i])
+        id(i).classList.add("dup");
+    }
+}
+function validate() {
+    let status= 1;
+   for(let i=0;i<answer.length;i++)
+   {
+       let sum=0;
+    
+   for(let i=0;i<9;i++){
+       if(answer!="-")
+    sum+=parseInt(answer[i]);
+       for(let j=i+9;j<81;j+=9){
+        if(answer!="-")
+           sum+=parseInt(answer[j]);
+       }
+   }
+   if(sum!=405){
+    status = 0;
+   }  
+    }
+    if(status==1){
+        endGame();
+        return;
+       } else {
+        alert("Something is not right, Try again.");
+       }   
+}
+function endGame() {
+    sessionStorage.clear();
+    for(let i=0;i<81;i++){
+        id(i).classList.add("prefilled");      
+    }
+    alert("You Win!, GGWP!");
+}
+function cani(num) {
+    let pass = 1;
+    let col = parseInt(selectedCell.id % 9);
+    let row = parseInt(selectedCell.id / 9);
+    let s = selectedCell.id;
+    for(let i=col;i<col+73;i+=9)
+    {
+        if(num==answer[i]){
+            pass = 0;
+            break;
+        }
+    }
+    for(let i=row*9;i<row*9+9;i++)
+    {
+        if(num==answer[i]){
+            pass = 0;
+            break;
+        }
+    }
+    let x = 0;
+    let y = 3;
+    if( (-1<s && s<3) || (8<s && s<12) || (17<s && s<21) ) {    
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }
+        }
+    x = 3;
+    y = 6;
+    if( (2<s && s<6) || (11<s && s<15) || (20<s && s<24) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }
+    }
+    x = 6;
+    y = 9;
+    if( (5<s && s<9) || (14<s && s<18) || (23<s && s<27) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }       
+    }
+    x=27;
+    y=30;
+    if( (26<s && s<30) || (35<s && s<39) || (44<s && s<48) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }    
+    }
+    x = 30;
+    y = 33;
+    if( (29<s && s<33) || (38<s && s<42) || (47<s && s<51) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }    
+    }
+    x = 33;
+    y = 36;
+    if( (32<s && s<36) || (41<s && s<45) || (50<s && s<54) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }    
+    }
+    x = 54;
+    y = 57;
+    if( (53<s && s<57) || (62<s && s<66) || (71<s && s<75) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }    
+    }
+    x = 57;
+    y = 60;
+    if( (56<s && s<60) || (65<s && s<69) || (74<s && s<78) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }    
+    }
+    x = 60;
+    y = 63;
+    if( (59<s && s<63) || (68<s && s<72) || (77<s && s<81) ) {
+        for(let i=x;i<y;i++){
+            for(let j=i;j<i+19;j+=9){
+                if(num==answer[j]){
+                    pass = 0;
+                    break;
+                }
+                }
+            }   
+    }
+    return pass;
+}
+function id(id) {
     return document.getElementById(id);
-  }
-  function query(selector) {
+}
+function q(selector) {
     return document.querySelector(selector);
-  }
-  function queryAll(selector) {
+}
+function qA(selector) {
     return document.querySelectorAll(selector);
-  }
+}
+function printSession() {
+    console.log(sessionStorage.getItem("cache"));
+    console.log(sessionStorage.getItem("diff"));  
+}
