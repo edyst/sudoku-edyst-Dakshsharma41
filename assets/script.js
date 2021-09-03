@@ -1,463 +1,362 @@
-const easy = [
-    "6------7------5-2------1---362----81--96-----71--9-4-5-2---651---78----345-------",
-    "685329174971485326234761859362574981549618732718293465823946517197852643456137298"
-  ];
-  const medium = [
-    "--9-------4----6-758-31----15--4-36-------4-8----9-------75----3-------1--2--3---",
-    "619472583243985617587316924158247369926531478734698152891754236365829741472163895"
-  ];
-  const hard = [
-    "-1-5-------97-42----5----7-5---3---7-6--2-41---8--5---1-4------2-3-----9-7----8--",
-    "712583694639714258845269173521436987367928415498175326184697532253841769976352841"
-  ];
-var selectedCell;
-var difficulty = easy[0];
-var answer = [""];
-let diffNum = 1;
-window.onload = function () {
-    startGame(); 
+var h3 = document.querySelector('.h3');
+function restrictAlphabets(e) {
+    var x = e.which || e.keycode;
+    if ((x >= 49 && x <= 57))
+        return true;
+    else
+        return false;
 }
-function changeDifficulty(n) {
-    switch(n)
+var table = document.querySelector('.table');
+var easy = [[2,null,5,null,null,9,null,null,4],
+            [null,null,null,null,null,null,3,null,7],
+            [7,null,null,8,5,6,null,1,null],
+            [4,5,null,7,null,null,null,null,null],
+            [null,null,9,null,null,null,1,null,null],
+            [null,null,null,null,null,2,null,8,5],
+            [null,2,null,4,1,8,null,null,6],
+            [6,null,8,null,null,null,null,null,null],
+            [1,null,null,2,null,null,7,null,8]];
+
+var easybutton = document.querySelector(".easy");
+window.addEventListener("load",(e)=>{
+    easybutton.style.border = "2px solid blue";
+    mediumbutton.style.border = null;
+    hardbutton.style.border = null;
+
+    let tr = table.firstElementChild;
+    for(let i=0; i<9; i++)
     {
-        case 1 :  window.difficulty = easy[0];
-        break;
-        case 2 :  window.difficulty = medium[0];
-        break;
-        case 3 :  window.difficulty = hard[0];
-        break;
-        default: window.difficulty = easy[0];
-    }
-    diffNum = n;
-    startGame();
-}
-function updateMove() {
-    if(selectedCell)
-    {
-        document.addEventListener('keydown', (event) => {
-            var name = event.key;
-            if(name>0 && name<10 && cani(name))
+        let td = tr.firstElementChild;
+        for(let j=0; j<9; j++)
+        {
+            
+            td.firstElementChild.value = easy[i][j];
+            td.firstElementChild.addEventListener("input",(e)=>{
+                check(e);
+            });
+            td.firstElementChild.addEventListener("mouseup",(e)=>{
+                highlight(e);
+            });
+            
+
+            if(easy[i][j]!==null)
             {
-            selectedCell.textContent = name;
-            addToArray(name);
-            addToCache();          
-            } else if(name==0){
-                selectedCell.textContent = null;
-                removeFromArray();
+                td.firstElementChild.disabled = true;     
             }
-          }, false);       
-    }
-    highSelect();
-}
-function startGame() {
-    let board;    
-    board = difficulty;    
-    fillAns(difficulty);    
-    createBoard(board);
-    if(sessionStorage.getItem("cache")){
-        var saved  = sessionStorage.getItem("cache");
-        var diff = sessionStorage.getItem("diff");
-        if(diff != diffNum){
-        if(diff==1) {
-            changeDifficulty(1);
-        } else if(diff==2) {
-            changeDifficulty(2);
-        } else if(diff==3) {
-            changeDifficulty(3);
+            else
+            {
+                td.firstElementChild.disabled = false;
+            }
+            td = td.nextElementSibling;
+
         }
-            } else {
-            saved = saved.split(",");
-            answer = saved;
-            for(i=0;i<81;i++){
-            if(saved[i]!="-" && saved[i]!=difficulty[i]){
-            qA(".cell")[i].classList.add("modified"); 
-            id(i).textContent = saved[i];
-            }
-        }
-            }
-        
+        tr = tr.nextElementSibling;
     }
-}
-function highSelect() {
-    for(let i=0;i<81;i++) {
-    qA(".cell")[i].classList.remove("highlighted");
-    qA(".cell")[i].classList.remove("dup");
-    }
-    let col = parseInt(selectedCell.id % 9);
-    let row = parseInt(selectedCell.id / 9);
-    let s = selectedCell.id;
-    for(let i=0;i<81;i++){
-        if(parseInt(selectedCell.textContent)==answer[i])
-        id(i).classList.add("dup");
-    }
-    for(let i=col;i<col+73;i+=9)
+});
+var easy = [[2,null,5,null,null,9,null,null,4],
+            [null,null,null,null,null,null,3,null,7],
+            [7,null,null,8,5,6,null,1,null],
+            [4,5,null,7,null,null,null,null,null],
+            [null,null,9,null,null,null,1,null,null],
+            [null,null,null,null,null,2,null,8,5],
+            [null,2,null,4,1,8,null,null,6],
+            [6,null,8,null,null,null,null,null,null],
+            [1,null,null,2,null,null,7,null,8]];
+
+easybutton.addEventListener("click",(e)=>{
+	h3.innerHTML = "";
+    easybutton.style.border = "2px solid blue";
+    mediumbutton.style.border = null;
+    hardbutton.style.border = null;
+    let tr = table.firstElementChild;
+    for(let i=0; i<9; i++)
     {
-        if(i!=s) {
-            id(i).classList.add("highlighted");
-        }       
-    } 
-    for(let i=row*9;i<row*9+9;i++)
+        let td = tr.firstElementChild;
+        for(let j=0; j<9; j++)
+        {
+            td.firstElementChild.setAttribute("class", "cell");
+            td.firstElementChild.style.backgroundColor = "";
+            td.firstElementChild.value = easy[i][j];
+            if(easy[i][j]!==null)
+            {
+                td.firstElementChild.disabled = true;     
+            }
+            else
+            {
+                td.firstElementChild.disabled = false;
+            }
+            td = td.nextElementSibling;
+
+        }
+        tr = tr.nextElementSibling;
+    }
+});
+var medium = [[null,null,6,null,9,null,2,null,null],
+              [null,null,null,7,null,2,null,null,null],
+              [null,9,null,5,null,8,null,7,null],
+              [9,null,null,null,3,null,null,null,6],
+              [7,5,null,null,null,null,null,1,9],
+              [1,null,null,null,4,null,null,null,5],
+              [null,1,null,3,null,9,null,8,null],
+              [null,null,null,2,null,1,null,null,null],
+              [null,null,9,null,8,null,1,null,null]];
+
+var mediumbutton = document.querySelector(".medium");
+
+mediumbutton.addEventListener("click",(e)=>{
+	h3.innerHTML = "";
+    mediumbutton.style.border = "2px solid blue";
+    easybutton.style.border = null;
+    hardbutton.style.border = null;
+    let tr = table.firstElementChild;
+    for(let i=0; i<9; i++)
     {
-        if(i!=s) {
-            id(i).classList.add("highlighted");
-        }
-    }
-    let x = 0;
-    let y = 3;
-    if( (-1<s && s<3) || (8<s && s<12) || (17<s && s<21) ) {    
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
+        let td = tr.firstElementChild;
+        for(let j=0; j<9; j++)
+        {
+            
+            td.firstElementChild.value = medium[i][j];
+            // td.firstElementChild.addEventListener("change",check);
+            td.firstElementChild.style.backgroundColor = "";
+            td.firstElementChild.setAttribute("class", "cell");
+            if(medium[i][j]!==null)
+            {
+                td.firstElementChild.disabled = true;     
             }
-        }
-    x = 3;
-    y = 6;
-    if( (2<s && s<6) || (11<s && s<15) || (20<s && s<24) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
+            else
+            {
+                td.firstElementChild.disabled = false;
             }
-    }
-    x = 6;
-    y = 9;
-    if( (5<s && s<9) || (14<s && s<18) || (23<s && s<27) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
-            }       
-    }
-    x=27;
-    y=30;
-    if( (26<s && s<30) || (35<s && s<39) || (44<s && s<48) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
-            }    
-    }
-    x = 30;
-    y = 33;
-    if( (29<s && s<33) || (38<s && s<42) || (47<s && s<51) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
-            }    
-    }
-    x = 33;
-    y = 36;
-    if( (32<s && s<36) || (41<s && s<45) || (50<s && s<54) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
-            }    
-    }
-    x = 54;
-    y = 57;
-    if( (53<s && s<57) || (62<s && s<66) || (71<s && s<75) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
-            }    
-    }
-    x = 57;
-    y = 60;
-    if( (56<s && s<60) || (65<s && s<69) || (74<s && s<78) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
-            }    
-    }
-    x = 60;
-    y = 63;
-    if( (59<s && s<63) || (68<s && s<72) || (77<s && s<81) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(j!=s) {
-                    id(j).classList.add("highlighted");
-                }
-                }
-            }   
-    }
-}
-function createBoard(board) {
-    clearPrevious();
-    let idCell = 0;
-    for(let i=0;i<81;i++){
-        let cell  = document.createElement("p");
-        if(board.charAt(i)!="-") {
-            cell.textContent = board.charAt(i);
-            cell.classList.add("prefilled");
-        }   else {
-            cell.addEventListener("click", function(){
-                if(cell.classList.contains("selected")) {
-                    cell.classList.remove("selected");
-                    selectedCell = null;
-                } else {
-                    for(let i=0;i<81;i++) {
-                        qA(".cell")[i].classList.remove("selected");
-                    }                  
-                }
-                cell.classList.add("selected");
-                selectedCell = cell;
-                updateMove();
-            }); 
+            td = td.nextElementSibling;
+
         }
-        cell.id = idCell;
-        idCell++;
-        cell.classList.add("cell");
-        if((cell.id > 17 && cell.id < 27) || (cell.id > 44 && cell.id < 54 )) {
-            cell.classList.add("bottomBorder");
+        tr = tr.nextElementSibling;
+    }
+});
+
+var hard = [[null,null,null,8,null,null,null,null,null],
+            [7,8,9,null,1,null,null,null,6],
+            [null,null,null,null,null,6,1,null,null],
+            [null,null,7,null,null,null,null,5,null],
+            [5,null,8,7,null,9,3,null,4],
+            [null,4,null,null,null,null,2,null,null],
+            [null,null,3,2,null,null,null,null,null],
+            [8,null,null,null,7,null,4,3,9],
+            [null,null,null,null,null,1,null,null,null]];
+
+var hardbutton = document.querySelector(".hard");
+hardbutton.addEventListener("click",(e)=>{
+ 	h3.innerHTML = "";
+    hardbutton.style.border = "2px solid blue";
+    mediumbutton.style.border = null;
+    easybutton.style.border = null;
+
+    let tr = table.firstElementChild;
+    for(let i=0; i<9; i++)
+    {
+        let td = tr.firstElementChild;
+        for(let j=0; j<9; j++)
+        {
+            
+            td.firstElementChild.value = hard[i][j];
+            // td.firstElementChild.addEventListener("change",check);
+            td.firstElementChild.style.backgroundColor = "";
+            td.firstElementChild.setAttribute("class", "cell");
+            if(hard[i][j]!==null)
+            {
+                td.firstElementChild.disabled = true;     
+            }
+            else
+            {
+                td.firstElementChild.disabled = false;
+            }
+            td = td.nextElementSibling;
+
         }
-        if( ((cell.id + 1) % 9 == 3) || ((cell.id + 1) % 9 == 6) ) {
-            cell.classList.add("rightBorder");
+        tr = tr.nextElementSibling;
+    }
+});
+
+function check(e){
+	var validate=[];
+    let tr = table.firstElementChild;
+    for(let i=0;i<9;i++)
+    {
+        validate[i]=[];
+        let td = tr.firstElementChild;
+        for(let j=0;j<9;j++)
+        {
+            validate[i][j]=td.firstElementChild.value;
+            td = td.nextElementSibling;
         }
-        if((cell.id + 1) % 9 == 0 || (cell.id + 1) % 9 == 0) {
-              cell.classList.add("rightBorder");
-         }
-        if((cell.id + 2) % 9 == 2 || (cell.id + 2) % 9 == 2) {
-            cell.classList.add("leftBorder");
+        tr = tr.nextElementSibling;
+    }
+    var id = e.target.id;
+    var r_index = parseInt(id[0]);
+    var c_index = parseInt(id[1]);
+    var r = validate[r_index];
+    var c = [];
+    let answer = false;
+    for(i=0; i<9; i++)
+    {
+    	c.push(validate[i][c_index]);
+    }
+    console.log(r_index);
+    console.log(c_index);
+   	for(let i in r)
+   	{
+          
+   		if(r[i]==validate[r_index][c_index] && i!=c_index)
+   		{
+            answer=true;
+   			break;
+   		}
+   	}
+       if(answer==false)
+       {
+        for(let i in c)
+        {
+            if(c[i]==validate[r_index][c_index] && i!=r_index)
+            {
+                
+                answer=true;
+                break;
+            }
+            
+        }
        }
-        if((cell.id > 71 && cell.id < 81)) {
-            cell.classList.add("bottomBorder");
-        }
-        if((cell.id > -1 && cell.id < 9)) {
-            cell.classList.add("topBorder");
-        }
-        id("board").appendChild(cell);
-    }
-}
-function clearPrevious() {
-    let cells = qA(".cell")
-    for(let i=0;i<cells.length;i++)
-    {
-        cells[i].remove();
-    }
-}
-function reset(){
-    let diff = sessionStorage.getItem("diff");
-    sessionStorage.clear();
-    changeDifficulty(diff);
-}
-function fillAns(str) {
-    for(let i=0;i<str.length;i++) {
-        answer[i] = str[i];
-    }  
-}
-function addToCache() {
-    sessionStorage.setItem("cache",answer);
-    sessionStorage.setItem("diff",diffNum);
-}
-function addToArray(num) {
-    let index = q(".selected").id;
-    answer.splice(index,1,num);
-    q(".selected").classList.add("modified");
-    duplicate(num);
-}
-function removeFromArray() {
-    let index = q(".selected").id;
-    answer.splice(index,1,"-");
-    q(".selected").classList.remove("modified");
-}
-function duplicate(num) {
-    for(let i=0;i<81;i++){
-        if(num==answer[i])
-        id(i).classList.add("dup");
-    }
-}
-function validate() {
-    let status= 1;
-   for(let i=0;i<answer.length;i++)
-   {
-       let sum=0;
+       if(answer==false)
+       {
+           var r_start = r_index - r_index%3;
+           var c_start = c_index - c_index%3;
+           for(let i=r_start;i<r_start+3;i++)
+           {
+               for(let j=c_start;j<c_start+3;j++)
+               {
+                         if(validate[i][j]==validate[r_index][c_index] && (r_index!=i && c_index!=j))
+                         {
+                             answer=true;
+                             break;
+                         }
+               }
+           }
+       }
+       if(answer==true)
+       {
+        document.getElementById(id).setAttribute("class","redcell");
+       }
+       else
+       {
+        document.getElementById(id).setAttribute("class","blackcell");
+       }
+       e.target.backgroundColor
+   	
+
+    	
     
-   for(let i=0;i<9;i++){
-       if(answer!="-")
-    sum+=parseInt(answer[i]);
-       for(let j=i+9;j<81;j+=9){
-        if(answer!="-")
-           sum+=parseInt(answer[j]);
-       }
-   }
-   if(sum!=405){
-    status = 0;
-   }  
-    }
-    if(status==1){
-        endGame();
-        return;
-       } else {
-        alert("Something is not right, Try again.");
-       }   
 }
-function endGame() {
-    sessionStorage.clear();
-    for(let i=0;i<81;i++){
-        id(i).classList.add("prefilled");      
-    }
-    alert("You Win!, GGWP!");
-}
-function cani(num) {
-    let pass = 1;
-    let col = parseInt(selectedCell.id % 9);
-    let row = parseInt(selectedCell.id / 9);
-    let s = selectedCell.id;
-    for(let i=col;i<col+73;i+=9)
+//Hover effect
+ 
+function highlight(e)
+{
+	h3.innerHTML = "";
+	let highlight=[];
+    let tr = table.firstElementChild;
+    for(let i=0;i<9;i++)
     {
-        if(num==answer[i]){
-            pass = 0;
-            break;
+        highlight[i]=[];
+        let td = tr.firstElementChild;
+        for(let j=0;j<9;j++)
+        {
+            highlight[i][j]=td.firstElementChild;
+            td.firstElementChild.style.backgroundColor = ""; 
+            if(highlight[i][j].value==e.target.value && highlight[i][j].value!=="")
+            {
+            	highlight[i][j].style.backgroundColor = "aqua";
+            }
+            td = td.nextElementSibling;
         }
+        tr = tr.nextElementSibling;
     }
-    for(let i=row*9;i<row*9+9;i++)
+    let id = e.target.id;
+    let r_index = parseInt(id[0]);
+    let c_index = parseInt(id[1]);
+    let r = highlight[r_index];
+    let c = [];
+    for(i=0; i<9; i++)
     {
-        if(num==answer[i]){
-            pass = 0;
-            break;
+    	c.push(highlight[i][c_index]);
+    }
+   	for(let i of r)
+   	{
+   		if(!(i.getAttribute("class")==="redcell" || i.getAttribute("class")==="blackcell" ||i.style.backgroundColor=="aquamarine"))
+   		{
+    		i.style.backgroundColor = "#EFEFEF";
+    	}
+   	}
+      
+    for(let i of c)
+    {
+    	if(!(i.getAttribute("class")==="redcell" || i.getAttribute("class")==="blackcell" ||i.style.backgroundColor=="aquamarine"))
+    	{
+    		i.style.backgroundColor = "#EFEFEF";
+    	}
+    }
+    let r_start = r_index - r_index%3;
+    let c_start = c_index - c_index%3;
+    for(let i=r_start;i<r_start+3;i++)
+    {
+        for(let j=c_start;j<c_start+3;j++)
+        {
+        	if(!(highlight[i][j].getAttribute("class")==="redcell" || highlight[i][j].getAttribute("class")==="blackcell" ||highlight[i][j].style.backgroundColor=="aquamarine"))
+        	{
+        		highlight[i][j].style.backgroundColor = "#EFEFEF";
+        	}         
         }
     }
-    let x = 0;
-    let y = 3;
-    if( (-1<s && s<3) || (8<s && s<12) || (17<s && s<21) ) {    
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
+    
+e.target.style.backgroundColor = 'aliceblue';
+    	    
+}
+
+//Validation
+
+var validatebutton = document.querySelector(".validate");
+validatebutton.addEventListener("click",(e)=>{
+
+
+    
+    var x;
+	var gotNull = false;
+    let tr = table.firstElementChild;
+    for(let i=0;i<9;i++)
+    {
+        let td = tr.firstElementChild;
+        for(let j=0;j<9;j++)
+        {
+            x=td.firstElementChild;
+            if(x.getAttribute('class')==="redcell")
+            {
+            	alert('Soduku is not correct!!');
+            	return;
+            
             }
+            
+            if(x.value==="")
+            {
+            	gotNull = true;
+            }
+            td = td.nextElementSibling;
         }
-    x = 3;
-    y = 6;
-    if( (2<s && s<6) || (11<s && s<15) || (20<s && s<24) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
-            }
+        tr = tr.nextElementSibling;
     }
-    x = 6;
-    y = 9;
-    if( (5<s && s<9) || (14<s && s<18) || (23<s && s<27) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
-            }       
+    
+    if(gotNull===true)
+    {
+    	 alert('Going Good..Press OK to continue!!');
     }
-    x=27;
-    y=30;
-    if( (26<s && s<30) || (35<s && s<39) || (44<s && s<48) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
-            }    
+    else
+    {
+    	 alert('Congratulations,You have successfully completed your game!');	
     }
-    x = 30;
-    y = 33;
-    if( (29<s && s<33) || (38<s && s<42) || (47<s && s<51) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
-            }    
-    }
-    x = 33;
-    y = 36;
-    if( (32<s && s<36) || (41<s && s<45) || (50<s && s<54) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
-            }    
-    }
-    x = 54;
-    y = 57;
-    if( (53<s && s<57) || (62<s && s<66) || (71<s && s<75) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
-            }    
-    }
-    x = 57;
-    y = 60;
-    if( (56<s && s<60) || (65<s && s<69) || (74<s && s<78) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
-            }    
-    }
-    x = 60;
-    y = 63;
-    if( (59<s && s<63) || (68<s && s<72) || (77<s && s<81) ) {
-        for(let i=x;i<y;i++){
-            for(let j=i;j<i+19;j+=9){
-                if(num==answer[j]){
-                    pass = 0;
-                    break;
-                }
-                }
-            }   
-    }
-    return pass;
-}
-function id(id) {
-    return document.getElementById(id);
-}
-function q(selector) {
-    return document.querySelector(selector);
-}
-function qA(selector) {
-    return document.querySelectorAll(selector);
-}
-function printSession() {
-    console.log(sessionStorage.getItem("cache"));
-    console.log(sessionStorage.getItem("diff"));  
-}
+})
